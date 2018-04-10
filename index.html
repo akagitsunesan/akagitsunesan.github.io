@@ -1,0 +1,50 @@
+<html>
+<link rel="stylesheet" type="text/css" href="songlist.css">
+<script src="jquery-3.3.1.min.js"></script>
+<script>
+	var songList;
+	function callsearch(e, query) {
+		if (e.keyCode == 13) {
+			search(query);
+		}
+	}
+	function search(query) {
+        $.get({ 
+        url: "https://itunes.apple.com/search?term=" + query.replace(' ', '+') + "&limit=10", 
+        success: function(response) {
+            var songsList = JSON.parse(response).results;
+            var results = $("#results");
+            results.html("");
+            for (var i = 0; i < songsList.length; i++) {
+                var song = songsList[i];
+                var songText = $('<span class="songlist__song">' + song.artistName + ' -- ' + song.trackName + '</span>');
+                var songAdd = $('<span class="songlist__add-to-playlist">+</span>');
+                var songItem= $('<div class="songlist__item"></div>');
+                songItem.append(songText);
+                songItem.append(songAdd);
+                songAdd.click(function(event) {
+                   	var addSong = event.currentTarget.parentElement.children[0].innerHTML;
+					var favs = $("#favs");
+					var favItem= $('<div class="favouritelist__item"></div>');
+					var favText = $('<span class="favouritelist__song">' + addSong + '</span>');
+					favItem.append(favText);
+					favItem.appendTo(favs)
+				});
+                songItem.appendTo(results);
+            }
+        } 
+    	});
+	}
+</script>
+<body>
+<div class = "songlist">
+	<span class ="boxtitle">Search in Apple Music [type and press 'enter']</span>
+	<input type = "text" id = "search-input" value="Search" onkeypress="callsearch(event, value)"></input>
+	<div id="results"> </div>
+</div>
+<div class = "favouritelist">
+	<span class ="boxtitle">My Favourite Music</span>
+	<div id ="favs"> </div>
+</div>
+</body>
+</html>
